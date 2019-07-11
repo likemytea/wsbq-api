@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html> 
+<head>
+	<meta charset="UTF-8"> <title>SOCKET.IO DEMO</title>
+	<base> 
+	<script src="http://47.106.242.180/js/jquery.min.js?v=2.1.4"></script>
+	<script src="http://47.106.242.180/js/socket.io.min.1.7.4.js"></script> 
+	<style>
+        body {padding: 20px;}
+        #console {height: 450px;overflow: auto;}
+        .username-msg {color: orange;}
+        .connect-msg {color: green;}
+        .disconnect-msg {color: red;}
+    </style> 
+</head> 
+<body> 
+        <h1>即时通信测试</h1>
+	<div id="console" class="well"></div> 
+	<form class="well form-inline" onsubmit="return false;"> 
+	<input id="username" class="input-xlarge" type="hidden" placeholder="用户名称. . . " />
+	<input id="userid" class="input-xlarge" type="hidden" placeholder="用户id. . . " />
+	<input id="msg" type="text" placeholder="按回车即发送..." onkeydown="keyup_submit(event);"/> 
+	<button type="button" onClick="sendMessage()" class="btn">发送</button> 
+	<button type="button" onClick="sendDisconnect()" class="btn">离线</button> 
+	<button type="button" onClick="reloadThis()" class="btn">上线</button> 
+	</form> 
+	<!--<audio controls="controls" autoplay="autoplay">-->
+        <audio controls="controls" id="bgAudio">
+	    <source src="http://47.106.242.180/mp3/guxiangyuanfengjing.mp3" type="audio/mpeg" />
+	    Your browser does not support the audio element.
+	</audio>	
+</body> 
+	<script type="text/javascript">
+	document.getElementById("bgAudio").volume = 0.2; 
+    var socket;
+    connect();
+    var receiver = '刘兴';
+    
+    function connect() {
+    	var sender ='雨晨';
+        var opts = {
+            query: 'sender=' + sender
+        };
+        socket = io.connect('http://test.huayubenji.com:9099', opts);
+		
+        $("#username").val(sender);
+        $("#userid").val(sender);
+        socket.on('connect', function () {
+            
+            serverOutput('<span class="connect-msg">------------------------</span>');
+            socket.emit('push_event', {
+                sender: $("#userid").val(),
+                nickName: $("#username").val(),
+                receiver: receiver,
+                content: "已上线!"
+            });
+        });
+
+        socket.on('push_event', function (data) {
+            output('<span class="username-msg"><img  src="http://47.106.242.180/img/'+receiver+'.jpg" height="32" width="32"/></span>' +
+                ' '+data.content);
+        });
+
+        socket.on('disconnect', function () {
+            serverOutput('<span class="disconnect-msg">' + $("#username").val() + '已下线! </span>');
+        });
+
+        socket.on('connect_msg',function(data){
+            console.log('server reply connect:',data);
+        });
+    }
+
+    function reloadThis() {
+        socket.disconnect();
+        connect();
+        console.log(socket);
+    }
+
+    function sendDisconnect() {
+        socket.emit('push_event', {
+            sender: 'client-proj',
+            nickName: $("#username").val(),
+            receiver: receiver,
+            content: "已下线!"
+        });
+        socket.disconnect();
+    }
+
+    function sendMessage() {
+    	if($('#msg').val()==''){
+    		return;
+    	}
+        socket.emit('push_event', {
+            sender: $("#userid").val(),
+            nickName: $("#username").val(),
+            receiver: receiver,
+            content: $('#msg').val()
+        },function (answer) {
+        	if(answer===1){
+                output('&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'
+                		+'<span class="username-msg"><img  src="http://47.106.242.180/img/'+$("#userid").val()+'.jpg" height="32" width="32"/></span>' +
+                        ' '+$("#msg").val());
+        	}else{
+                output('&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'
+                		+'<span class="username-msg"><img  src="http://47.106.242.180/img/'+$("#userid").val()+'.jpg" height="32" width="32"/></span>' +
+                        ' '+$("#msg").val()+'<font color="red">(发送失败)</font>');
+        	}
+        	$("#msg").val("");	
+        });
+    }
+    var divid=1;
+    function output(message) {
+    	divid++;
+        var currentTime = "<span class='time' >" + new Date() + "</span>";
+        var element = $("<div id="+divid+">" + " " + message + "</div>");
+        $('#console').append(element);
+        document.getElementById(divid).scrollIntoView(false);
+    }
+
+    function serverOutput(message) {
+    	divid++;
+        var element = $("<div id="+divid+">" + message + "</div>");
+        $('#console').append(element);
+        document.getElementById(divid).scrollIntoView(false);
+    }
+	
+	
+	function keyup_submit(e){
+        var evt = window.event || e;
+        if (evt.keyCode == 13){
+            sendMessage();
+        }
+    }
+</script>
+</html>

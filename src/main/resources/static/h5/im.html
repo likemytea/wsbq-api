@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>HTML5仿电脑端微信聊天窗口界面代码</title>
+	<link rel="stylesheet" href="http://test.mystaticdomain.com/mychat/css/reset.min.css">
+	<link rel="stylesheet" href="http://test.mystaticdomain.com/mychat/css/style.css">
+	<script src="http://test.mystaticdomain.com/js/jquery.min.js?v=2.1.4"></script>
+	<script src="http://test.mystaticdomain.com/js/socket.io.min.1.7.4.js"></script>
+</head>
+<body>
+
+<div class="wrapper">
+	<div class="container">
+        <div class="left">
+            <div class="top">
+                <input type="text" placeholder="Search" />
+                <a href="javascript:;" class="search"></a>
+            </div>
+            <ul class="people" id="friends">
+
+            </ul>
+        </div>
+        <div class="right" id="chatSpace">
+            <div class="top"><span>To: <span class="name">Dog Woofson</span></span></div>
+         
+            <div class="write" style="display:none">
+                <a href="javascript:;" class="write-link attach"></a>
+                <input id="msg" type="text" placeholder="在这里说点儿什么   ...." onkeydown="keyup_submit(event);"/>
+                <a href="javascript:;" class="write-link smiley"></a>
+                <a href="javascript:;" class="write-link send"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div style="text-align:center;margin:1px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+<p>适用浏览器：360、FireFox、Chrome、Opera、傲游、搜狗、世界之窗. 不支持Safari、IE8及以下浏览器。</p>
+<p>来源：<a href="http://www.lanrenzhijia.com/" target="_blank">懒人</a></p>
+</div>
+<input id="username" class="input-xlarge" type="hidden" placeholder="用户名称. . . " />
+<input id="userid" class="input-xlarge" type="hidden" placeholder="用户id. . . " />
+<script type="text/javascript">
+var socket;
+var msg='';
+var friends;
+var chat;
+var userId = getQueryString('userId');
+var chatPerson = '';
+var divid=1;
+connect(userId);
+
+//document.querySelector('.chat[data-chat=person2]').classList.add('active-chat');
+//document.querySelector('.person[person-chat=person2]').classList.add('active');
+
+
+function initDataAndAddListener(){
+	friends = {
+	  list: document.querySelector('ul.people'),
+	  all: document.querySelectorAll('.left .person'),
+	  name: '' },
+	
+	chat = {
+	  container: document.querySelector('.container .right'),//所有聊天放到container里边
+	  current: null,
+	  person: null,
+	  name: document.querySelector('.container .right .top .name') };//把聊天栏上面的属性付给"chat数组"中的name.
+	  
+	friends.all.forEach(function (f) {
+	  f.addEventListener('mousedown', function () {
+		  alert('ccc');
+	    //展示对话框
+	    $(".write").css('display','');
+	    chatPerson = f.getAttribute('person-chat');
+	    
+	    //取消来消息时朋友列表闪烁功能
+        $('[person-chat="' + chatPerson + '"]').css("background", "");
+	    //填充聊天信息
+	    fillUpMessage(chatPerson);
+	    f.classList.contains('active') || setAciveChat(f);
+	  });
+	});
+}
+
+function fillUpMessage(chatPerson){
+    if($("#"+chatPerson).children().length===0){
+	    //从后台获取聊天纪录
+	    getMsg(userId,chatPerson);
+    }
+}
+
+function setAciveChat(f) {
+  if(friends.list.querySelector('.active')!=null){
+      friends.list.querySelector('.active').classList.remove('active');//移除之前选中的朋友的光标
+  }
+  f.classList.add('active');//添加选中朋友光标
+  chat.current = chat.container.querySelector('.active-chat');//把之前的聊天信息放到当前里边
+  chat.person = f.getAttribute('person-chat');//把当前人放到数组
+  if(chat.current!=null){
+      chat.current.classList.remove('active-chat');//移除之前选中的朋友的聊天光标
+  }
+  chat.container.querySelector('[data-chat="' + chat.person + '"]').classList.add('active-chat');//添加选中的朋友的聊天记录的光标
+  friends.name = f.querySelector('.name').innerText;//把选中的朋友的名字放到 friends数组里。
+  chat.name.innerHTML = friends.name;//把选中的朋友的名字放到右侧top处的名字上。
+  $('[data-chat="' + chat.person + '"]').scrollTop($('[data-chat="' + chat.person + '"]')[0].scrollHeight);
+ // $('[data-chat="' + chat.person + '"]').append(element);
+}
+
+function connect(userId) {
+    var opts = {
+        query: 'sender=' + userId
+    };
+    socket = io.connect('http://test.huayubenji.com:9099', opts);
+	
+    $("#username").val(userId);
+    $("#userid").val(userId);
+    socket.on('connect', function () {
+        getFriendsLst(userId);
+        
+    });
+
+    socket.on('push_event', function (data) {
+        //来消息时朋友列表闪烁
+        if(data.sender!=chatPerson){
+            $('[person-chat="' + data.sender + '"]').css("background", "yellow");
+        }
+    	showReceivedMessage(data);
+    });
+
+    socket.on('disconnect', function () {
+    	isOnline('离线');
+    });
+}
+function isOnline(message) {
+	alert(message);
+}
+
+/**对话框回车事件*/
+function keyup_submit(e){
+	msg = $("#msg").val();
+    var evt = window.event || e;
+    if (evt.keyCode == 13){
+        sendMess();
+    }
+}
+
+function sendMess(){
+	if(msg==''){
+		return;
+	}
+    socket.emit('push_event', {
+        sender: $("#userid").val(),
+        nickName: $("#username").val(),
+        chatPerson: chatPerson,
+        content: msg
+    },function (answer) {
+    	if(answer===1){
+    		showSendedMessage(msg);
+    	}else{
+    		showSendedMessage(msg+'<font color="red">(发送失败)</font>');
+    	}
+    	$("#msg").val("");
+    });
+	
+	
+}
+
+function showSendedMessage(msg) {
+    var element = $('<div class="bubble me">' + ' ' + msg + '</div>');
+    $('[data-chat="' + chat.person + '"]').append(element);
+    if($('[data-chat="' + chat.person + '"]').length>0){
+	    $('[data-chat="' + chat.person + '"]').scrollTop($('[data-chat="' + chat.person + '"]')[0].scrollHeight);
+	}
+}
+
+function showReceivedMessage(data) {
+    var element = $('<div class="bubble you">' + ' ' + data.content + '</div>');
+    $('[data-chat="' + data.sender + '"]').append(element);
+    if($('[data-chat="' + chat.person + '"]').length>0){
+        $('[data-chat="' + chat.person + '"]').scrollTop($('[data-chat="' + chat.person + '"]')[0].scrollHeight);    
+    }
+}
+
+//获取friends列表
+function getFriendsLst($userId){
+   	 $.ajax({
+	     type:'get',
+	     url:'/wsbq/im/friends/list',
+	     async: true,
+	     data:{userId:$userId},
+	     cache:false,
+	     dataType:'json',
+	     success:function(data){
+	         //展示朋友列表，并预置每个朋友聊天层，以便接收朋友发送过来的消息。
+	    	 for(var i = 0; i < data.length; i++){
+	    	     var myFriends = $('<li class="person" person-chat='+data[i]+'><img src="http://test.mystaticdomain.com/mychat/img/'+data[i]+'.jpg" alt="" /><span class="name">'+data[i]+'</span></li>');
+	    	     $("#friends").append(myFriends);
+	    	     
+	    	     //添加此人聊天div
+	             var chatSpace = $('<div id='+data[i]+' class="chat" data-chat="'+data[i]+'"></div>');
+	             $("#chatSpace").append(chatSpace);
+	    	     
+	    	 }
+	    	 //初始化基本数据及为朋友列表添加监听事件
+	    	 initDataAndAddListener();
+	     },
+         error:function(XMLHttpRequest, textStatus, errorThrown) {
+           alert(XMLHttpRequest.responseText);
+         }
+	 });
+}
+
+
+//获取某个聊天信息
+function getMsg(userId,friend){
+	alert('asdfsadf');
+    socket.emit('push_event', {
+        actionType:'getMsg',
+        sender: userId,
+        chatPerson: friend
+    },function (answer) {
+             data = $.parseJSON(answer);
+	         //获取聊天信息。
+	    	 for(var i = 0; i < data.length; i++){
+	    	    var element;
+	    	    if(data[i]['u']===userId){
+	    	       element = $('<div class="bubble me">' + ' ' + data[i]['c'] + '</div>');
+	    	    }else{
+	    	       element = $('<div class="bubble you">' + ' ' + data[i]['c'] + '</div>');
+	    	    }
+			    $('[data-chat="' + friend + '"]').append(element);
+				$('[data-chat="' + friend + '"]').scrollTop($('[data-chat="' + friend + '"]')[0].scrollHeight);
+	    	 }
+    });
+}
+
+//获取某个聊天信息
+/***
+function getMsg(userId,friend){
+   	 $.ajax({
+	     type:'get',
+	     url:'/wsbq/im/chat/msg',
+	     async: false,
+	     data:{userId:userId,friend:friend},
+	     cache:false,
+	     dataType:'json',
+	     success:function(data){
+	    	 for(var i = 0; i < data.length; i++){
+	    	    var element;
+	    	    if(data[i]['u']===userId){
+	    	       element = $('<div class="bubble me">' + ' ' + data[i]['c'] + '</div>');
+	    	    }else{
+	    	       element = $('<div class="bubble you">' + ' ' + data[i]['c'] + '</div>');
+	    	    }
+			    $('[data-chat="' + friend + '"]').append(element);
+				$('[data-chat="' + friend + '"]').scrollTop($('[data-chat="' + friend + '"]')[0].scrollHeight);
+	    	 }
+	     },
+         error:function(XMLHttpRequest, textStatus, errorThrown) {
+           alert(XMLHttpRequest.responseText);
+         }
+	 });
+}
+***/
+/**通过js的正则表达式获取参数*/
+function getQueryString(userId)
+{
+     var reg = new RegExp("(^|&)"+ userId +"=([^&]*)(&|$)");
+     var r = window.location.search.substr(1).match(reg);
+     if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

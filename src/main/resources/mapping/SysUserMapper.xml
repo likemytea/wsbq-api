@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.thunisoft.wsbq.mapper.SysUserMapper">
+    <resultMap
+        id="BaseResultMap"
+        type="com.thunisoft.wsbq.po.SysUser">
+        <id
+            column="sys_user_id"
+            property="id"
+            jdbcType="INTEGER" />
+        <result
+            column="username"
+            property="username"
+            jdbcType="VARCHAR" />
+        <result
+            column="password"
+            property="password"
+            jdbcType="VARCHAR" />
+        <result
+            column="friends"
+            property="friends"
+            jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <resultMap
+        id="GroupBaseResultMap"
+        type="com.thunisoft.wsbq.po.SysRole">
+        <id
+            column="id"
+            property="id"
+            jdbcType="INTEGER" />
+        <result
+            column="name"
+            property="name"
+            jdbcType="VARCHAR" />
+    </resultMap>
+        
+    <sql id="Base_Column_List"> sys_user_id, username, password,friends
+    </sql>
+    <select
+        id="selectByUserName"
+        resultMap="BaseResultMap"
+        parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List" />
+        from sys_user where username = #{username}
+    </select>
+    <select
+        id="getGroupByUserName"
+        resultMap="GroupBaseResultMap"
+        parameterType="java.lang.String">
+SELECT role.*
+FROM sys_role_user AS ship ,
+sys_role  AS role  ,
+sys_user AS USER
+WHERE role.id = ship.sys_role_id AND ship.sys_user_id = user.sys_user_id AND user.username = #{username}
+    </select>    
+</mapper>

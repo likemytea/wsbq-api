@@ -1,0 +1,100 @@
+        <!--左侧导航开始-->
+        <nav class="navbar-default navbar-static-side" role="navigation" th:fragment="myleftmenu">
+            <div class="nav-close"><i class="fa fa-times-circle"></i>
+            </div>
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="dropdown profile-element">
+                            <span><img alt="image" class="img-circle" src="http://test.mystaticdomain.com/img/profile_small.jpg" /></span>
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="http://test.mystaticdomain.com/#">
+                                <span class="clear">
+                                <strong class="font-bold"><font color="green"><span th:text="${user.username}" class="block m-t-xs"></span></font></strong>
+                                <span class="text-muted text-xs block"><a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/homepage}">超级管理员</a><b class="caret"></b></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li><a class="J_menuItem" href="http://test.mystaticdomain.com/form_avatar.html">修改头像</a>
+                                </li>
+                                <li><a class="J_menuItem" href="http://test.mystaticdomain.com/profile.html">个人资料</a>
+                                </li>
+                                <li><a class="J_menuItem" href="http://test.mystaticdomain.com/contacts.html">联系我们</a>
+                                </li>
+                                <li><a class="J_menuItem" href="http://test.mystaticdomain.com/mailbox.html">信箱</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a href="http://test.mystaticdomain.com/login.html">安全退出</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="logo-element">H+
+                        </div>
+                    </li>
+                
+                    <li>
+                        <a href="http://test.mystaticdomain.com/#"><i class="fa fa-table"></i> <span class="nav-label">系统</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li><a class="J_menuItem" href="/wsbq/h5/list.html">用户管理
+                                <span class="label label-danger pull-right">TODO</span></a>
+                            </li>
+                            <li><a class="J_menuItem" href="http://172.16.176.102:8761/">eureka(服务监控中心)
+                                </a>
+                            </li>
+                            <li><a class="J_menuItem" href="/wsbq/h5/chat.html">即时通信页面
+                                <span class="label label-danger pull-right">nettysocketio</span></a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="http://test.mystaticdomain.com/#"><i class="fa fa-table"></i> <span class="nav-label">流程引擎</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li><a class="J_menuItem" href="/wsbq/h5/leaveForm.html">新建请假流程
+                                <span class="label label-danger pull-right">表单</span></a>
+                            </li>
+                            <li><a class="J_menuItem" href="/wsbq/h5/leaveTaskList.html">待办任务
+                                <span class="label label-danger pull-right">列表</span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="http://test.mystaticdomain.com/css_animation.html"><i class="fa fa-magic"></i> <span class="nav-label">CSS动画</span></a>
+                    </li>
+                    <li>
+                        <a href="http://test.mystaticdomain.com/#"><i class="fa fa-cutlery"></i> <span class="nav-label">工具 </span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li><a class="J_menuItem" href="http://test.mystaticdomain.com/form_builder.html">表单构建器</a>
+                            </li>
+                            <li><a class="J_menuItem" href="/wsbq/h5/demo.html">demo</a>
+                            </li>
+                            <li><a class="J_menuItem" href="/wsbq/h5/demoPagingJQuery.html">jquery动态分页</a>
+                            </li>                            
+                        </ul>                            
+                    </li>
+                    
+                    <li>
+                        <a class="J_menuItem" th:href="@{'/h5/im.html?userId='+${user.username}}"><i class="fa fa-magic"></i> <span class="nav-label">即时通信</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="/wsbq/h5/im2.html"><i class="fa fa-magic"></i> <span class="nav-label">即时通信2</span></a>
+                    </li>                    
+                    <li>
+                        <a class="J_menuItem" href="/wsbq/h5/mychat.html"><i class="fa fa-magic"></i> <span class="nav-label">刘兴</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="/wsbq/h5/mychat2.html"><i class="fa fa-magic"></i> <span class="nav-label">雨晨</span></a>
+                    </li>
+                    
+                    <li>
+                        <a href="http://test.mystaticdomain.com/#"><i class="fa fa-table"></i> <span class="nav-label">通讯录</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level" th:each="str:${user.friendsList}">
+                            <li><a class="J_menuItem" th:href="@{'/h5/mychat.html?chatWith='+${str}}" th:text="${str}"></a>
+                            </li>                     
+                        </ul>
+                    </li>                    
+                    
+                    
+                </ul>
+            </div>
+        </nav>
+        <!--左侧导航结束-->
