@@ -8,7 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.thunisoft.wsbq.po.SysUser;
+import com.thunisoft.wsbq.po.ApplicantInfo;
+import com.thunisoft.wsbq.service.ApplicantInfoService;
 import com.thunisoft.wsbq.service.SysUserService;
 
 /**
@@ -21,11 +22,13 @@ public class HomeController {
 
 	@Autowired
 	private SysUserService sysUserService;
+	@Autowired
+	private ApplicantInfoService applicantInfoService;
 
 	@RequestMapping("/")
 	public String goHomePage(Model model) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		SysUser user = sysUserService.findByUseName(userDetails.getUsername());
+		ApplicantInfo user = applicantInfoService.findByUseName(userDetails.getUsername());
 		// user.setFriendsList(user.getFriends().split(","));
 		model.addAttribute("user", user);
 		return "homepage";

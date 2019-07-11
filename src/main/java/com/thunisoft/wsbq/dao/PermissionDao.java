@@ -11,25 +11,26 @@ import org.springframework.stereotype.Repository;
 
 import com.thunisoft.wsbq.po.Permission;
 
-/**  
-* Description:
-* @author liuxing
-* @date 2018年5月14日  
-* @version 1.0  
-*/
+/**
+ * Description:
+ * 
+ * @author liuxing
+ * @date 2018年5月14日
+ * @version 1.0
+ */
 @Repository
 public class PermissionDao {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public List<Permission> findByPermissionByUserId(int userid) {
+	public List<Permission> findByPermissionByUserId(long userid) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("select p.description,p.id,p.name,p.pid,p.url from sys_user u ");
-		sb.append("LEFT JOIN sys_role_user sru on u.sys_user_id= sru.Sys_User_id ");
-		sb.append("LEFT JOIN sys_role r on sru.Sys_Role_id=r.id ");
-		sb.append("LEFT JOIN sys_permission_role spr on spr.role_id=r.id ");
-		sb.append("LEFT JOIN sys_permission p on p.id =spr.permission_id where u.sys_user_id=?");
+		sb.append("select p.description,p.id,p.name,p.pid,p.url from applicant_info u ");
+		sb.append("LEFT JOIN sys_role_applicant sru on u.id= sru.applicant_info_fk ");
+		sb.append("LEFT JOIN sys_role r on sru.sys_role_fk=r.id ");
+		sb.append("LEFT JOIN sys_permission_role spr on spr.sys_role_id=r.id ");
+		sb.append("LEFT JOIN sys_permission p on p.id =spr.sys_permission_id where u.id=?");
 
 		List<Permission> ms = jdbcTemplate.query(sb.toString(), new RowMapper<Permission>() {
 			@Override

@@ -9,7 +9,7 @@
                             <span><img alt="image" class="img-circle" src="http://test.mystaticdomain.com/img/profile_small.jpg" /></span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="http://test.mystaticdomain.com/#">
                                 <span class="clear">
-                                <strong class="font-bold"><font color="green"><span th:text="${user.username}" class="block m-t-xs"></span></font></strong>
+                                <strong class="font-bold"><font color="green"><span th:text="${user.applicantName}" class="block m-t-xs"></span></font></strong>
                                 <span class="text-muted text-xs block"><a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/homepage}">超级管理员</a><b class="caret"></b></span>
                                 </span>
                             </a>
@@ -73,27 +73,8 @@
                     </li>
                     
                     <li>
-                        <a class="J_menuItem" th:href="@{'/h5/im.html?userId='+${user.username}}"><i class="fa fa-magic"></i> <span class="nav-label">即时通信</span></a>
+                        <a class="J_menuItem" th:href="@{'/h5/im.html?userId='+${user.applicantName}}"><i class="fa fa-magic"></i> <span class="nav-label">即时通信</span></a>
                     </li>
-                    <li>
-                        <a class="J_menuItem" href="/wsbq/h5/im2.html"><i class="fa fa-magic"></i> <span class="nav-label">即时通信2</span></a>
-                    </li>                    
-                    <li>
-                        <a class="J_menuItem" href="/wsbq/h5/mychat.html"><i class="fa fa-magic"></i> <span class="nav-label">刘兴</span></a>
-                    </li>
-                    <li>
-                        <a class="J_menuItem" href="/wsbq/h5/mychat2.html"><i class="fa fa-magic"></i> <span class="nav-label">雨晨</span></a>
-                    </li>
-                    
-                    <li>
-                        <a href="http://test.mystaticdomain.com/#"><i class="fa fa-table"></i> <span class="nav-label">通讯录</span><span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level" th:each="str:${user.friendsList}">
-                            <li><a class="J_menuItem" th:href="@{'/h5/mychat.html?chatWith='+${str}}" th:text="${str}"></a>
-                            </li>                     
-                        </ul>
-                    </li>                    
-                    
-                    
                 </ul>
             </div>
         </nav>
