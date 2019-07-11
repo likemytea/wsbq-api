@@ -1,13 +1,14 @@
 package com.thunisoft.wsbq.util;
 
-import org.apache.commons.beanutils.Converter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.log4j.Logger;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.apache.commons.beanutils.Converter;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
+
+import com.alibaba.druid.util.StringUtils;
 
 public class DateConverter implements Converter {
 
@@ -51,7 +52,8 @@ public class DateConverter implements Converter {
                     DATETIME_PATTERN_NO_SECOND, MONTH_PATTERN});
 
             // all patterns failed, try a milliseconds constructor
-            if (result == null && StringUtils.isNotEmpty((String) value)) {
+            
+            if (result == null && (!StringUtils.isEmpty((String) value))) {
 
                 try {
                     result = new Date(new Long((String) value).longValue());
